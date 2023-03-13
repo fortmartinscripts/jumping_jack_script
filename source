@@ -111,7 +111,9 @@ function createGui()
 	
 	createTextLabel("Title","<b>JUMPING JACK SCRIPT!</b>",UDim2.new(0.093,0,0.024,0),UDim2.new(0.844,0,0.085,0))
 	
-	createTextLabel("JJAmount","<b>JJ Amount: 0</b>",UDim2.new(0.093,0,0.937,0),UDim2.new(0.844,0,0.063,0))
+	createTextLabel("JJAmount","<b>JJ Amount: 0</b>",UDim2.new(0.093,0,1.016,0),UDim2.new(0.844,0,0.063,0))
+	
+	createTextLabel("StartingAt","<b>Starting at: 0</b>",UDim2.new(0.093,0,1.076,0),UDim2.new(0.844,0,0.063,0))
 	
 	createTextLabel("MaxAmount","<b>MAX AMOUNT: "..maxJJ.."</b>",UDim2.new(0.091,0,0.145,0),UDim2.new(0.844,0,0.063,0))
 	
@@ -119,15 +121,19 @@ function createGui()
 	
 	createTextButton("JJ Confirm","<b>Confirm</b>",UDim2.new(0.675,0,0.22,0),UDim2.new(0.295,0,0.112,0))
 	
+	createTextBox("StartAt","Start at",UDim2.new(0.027,0,0.751,0),UDim2.new(0.611,0,0.121,0))
+
+	createTextButton("StartAtConfirm","<b>Confirm</b>",UDim2.new(0.675,0,0.76,0),UDim2.new(0.295,0,0.112,0))
+	
 	createTextButton("SwitchToJJ","<b>Switch to JJ</b>",UDim2.new(0.027,0,0.375,0),UDim2.new(0.943,0,0.099,0))
 	
 	createTextButton("SwitchToGJ","<b>Switch to GJ</b>",UDim2.new(0.027,0,0.498,0),UDim2.new(0.943,0,0.099,0))
 	
 	createTextButton("SwitchToHJ","<b>Switch to HJ</b>",UDim2.new(0.027,0,0.62,0),UDim2.new(0.943,0,0.099,0))
 	
-	createTextButton("Start","<b>Start!</b>",UDim2.new(0.351,0,0.825,0),UDim2.new(0.295,0,0.112,0))
+	createTextButton("Start","<b>START!</b>",UDim2.new(0.351,0,0.905,0),UDim2.new(0.295,0,0.112,0))
 	
-	local stop = createTextButton("Stop","<b>Stop</b>",UDim2.new(0.377,0,1.029,0),UDim2.new(0.243,0,0.092,0))
+	local stop = createTextButton("Stop","<b>Stop</b>",UDim2.new(0.377,0,1.152,0),UDim2.new(0.243,0,0.092,0))
 	stop.Visible = false
 	
 	createTextButton("Close","<b>X</b>",UDim2.new(0.867,0,0.032,0),UDim2.new(0.068,0,0.077,0),function()
@@ -168,12 +174,23 @@ local doJumpingJacks = 0
 local JJAmount = frame:FindFirstChild("JJ Amount")
 local JJAmountText = frame:FindFirstChild("JJAmount")
 local JJConfirm = frame:FindFirstChild("JJ Confirm")
+local StartAt = frame:FindFirstChild("StartAt")
+local StartAtConfirm = frame:FindFirstChild("StartAtConfirm")
+local StartingAt = frame:FindFirstChild("StartingAt")
 local doing = "JJ"
 local SwitchToJJ = frame:FindFirstChild("SwitchToJJ")
 local SwitchToGJ = frame:FindFirstChild("SwitchToGJ")
 local SwitchToHJ = frame:FindFirstChild("SwitchToHJ")
 local isJumping = false
 local _stop = false
+local jjStartAt = 0
+StartAtConfirm.MouseButton1Click:Connect(function()
+	if StartAt.Text ~= "" and tonumber(StartAt.Text) then
+		if isJumping then _stop = true end
+		jjStartAt = tonumber(StartAt.Text)
+		StartingAt.Text = "<b>Starting at: "..jjStartAt.."</b>"
+	end
+end)
 JJConfirm.MouseButton1Click:Connect(function()
 	if JJAmount.Text ~= "" and tonumber(JJAmount.Text) then
 		if isJumping then _stop = true end
@@ -187,6 +204,9 @@ SwitchToJJ.MouseButton1Click:Connect(function()
 		doing = "JJ"
 		JJAmount.PlaceholderText = "JJ Amount"
 		JJAmount.Text = ""
+		StartAt.Text = ""
+		StartingAt.Text = "<b>Starting at: 0</b>"
+		jjStartAt = 0
 		JJAmountText.Text = "<b>JJ Amount: "..doJumpingJacks.."</b>"
 	end
 end)
@@ -197,6 +217,9 @@ SwitchToGJ.MouseButton1Click:Connect(function()
 		JJAmount.PlaceholderText = "GJ Amount"
 		JJAmount.Text = ""
 		doJumpingJacks = 0
+		StartAt.Text = ""
+		StartingAt.Text = "<b>Starting at: 0</b>"
+		jjStartAt = 0
 		JJAmountText.Text = "<b>GJ Amount: "..doJumpingJacks.."</b>"
 	end
 end)
@@ -207,6 +230,9 @@ SwitchToHJ.MouseButton1Click:Connect(function()
 		JJAmount.PlaceholderText = "HJ Amount"
 		JJAmount.Text = ""
 		doJumpingJacks = 0
+		StartAt.Text = ""
+		StartingAt.Text = "<b>Starting at: 0</b>"
+		jjStartAt = 0
 		JJAmountText.Text = "<b>HJ Amount: "..doJumpingJacks.."</b>"
 	end
 end)
@@ -219,13 +245,13 @@ start.MouseButton1Click:Connect(function()
 	if isJumping then return end
 	isJumping = true
 	stop.Visible = true
-	for i = 0, doJumpingJacks do
+	for i = jjStartAt, doJumpingJacks do
 		if _stop then _stop = false break end
 		if i > maxJJ then break end
 		if i ~= 0 then
 			if doing == "JJ" then
 				sendMessage(jumpingJacks[i])
-				wait(.1)
+				wait(math.random(0.05,0.1))
 				LocalHumanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 			elseif doing == "GJ" then
 				local num = jumpingJacks[i]
@@ -246,7 +272,7 @@ start.MouseButton1Click:Connect(function()
 					end
 					_num ..= "."
 					sendMessage(_num)
-					wait(.1)
+					wait(math.random(0.05,0.1))
 					LocalHumanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 				end
 			elseif doing == "HJ" then
@@ -254,7 +280,7 @@ start.MouseButton1Click:Connect(function()
 				if num then
 					for letter in string.gmatch(num,"(%w)") do
 						sendMessage(letter)
-						wait(.1)
+						wait(math.random(0.04,0.08))
 						LocalHumanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 						wait(1)
 					end
@@ -263,7 +289,8 @@ start.MouseButton1Click:Connect(function()
 					LocalHumanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 				end
 			end
-			wait(math.random(1,1.5))
+			local waitTime = 1 + ((string.len(jumpingJacks[i]) - 1)+math.random(0,.4))/50
+			task.wait(waitTime)
 		end
 	end
 	isJumping = false
